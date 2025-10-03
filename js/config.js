@@ -17,11 +17,8 @@ const CONFIG = {
     TIMESLOTS: {
         '7am': { start: 390, end: 480, label: '7:00 AM' },    // 6:30 AM - 8:00 AM
         '3pm': { start: 870, end: 960, label: '3:00 PM' },    // 2:30 PM - 4:00 PM
-        TIMESLOTS: {
-    '7am': { start: 390, end: 480, label: '7:00 AM' },   // 6:30 AM - 8:00 AM
-    '3pm': { start: 870, end: 960, label: '3:00 PM' },   // 2:30 PM - 4:00 PM
-    '10pm': { label: '10:00 PM' }                        // Always active
-}
+        '10pm': { start: 1290, end: 1380, label: '10:00 PM' } // 9:30 PM - 11:00 PM
+    }
 
-        }
 };
+

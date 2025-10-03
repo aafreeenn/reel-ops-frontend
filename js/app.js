@@ -63,18 +63,12 @@ const App = {
         
         // Update each timeslot button
         Object.keys(CONFIG.TIMESLOTS).forEach(slot => {
-    const button = document.getElementById(`slot${slot}`);
-    if (button) {
-        const config = CONFIG.TIMESLOTS[slot];
-
-        if (slot === '10pm') {
-            button.disabled = false; // always enabled
-        } else {
-            button.disabled = !(totalMinutes >= config.start && totalMinutes <= config.end);
-        }
-    }
-});
-
+            const button = document.getElementById(`slot${slot}`);
+            if (button) {
+                const config = CONFIG.TIMESLOTS[slot];
+                button.disabled = !(totalMinutes >= config.start && totalMinutes <= config.end);
+            }
+        });
         
         // Update current time display
         const timeDisplay = document.getElementById('currentTime');
@@ -122,18 +116,13 @@ const App = {
             this.buttonStates[index] = { name: name, status: 'Not Set' };
         });
         
-        // Close modals when clicking outside
-window.onclick = (event) => {
-    const statusModal = document.getElementById('statusModal');
-    const technicianModal = document.getElementById('technicianModal');
-    
-    if (event.target === statusModal) {
-        this.closeModal();
-    }
-    if (event.target === technicianModal) {
-        this.closeTechnicianModal();
-    }
-};
+        // Close modal when clicking outside
+        window.onclick = (event) => {
+            const modal = document.getElementById('statusModal');
+            if (event.target === modal) {
+                this.closeModal();
+            }
+        };
     },
     
     openModal: function(index) {
@@ -163,58 +152,35 @@ window.onclick = (event) => {
         }
     },
     
-    showSaveModal: function() {
-    document.getElementById('technicianModal').style.display = 'flex';
-    // Focus on input field
-    setTimeout(() => {
-        document.getElementById('technicianName').focus();
-    }, 100);
-},
-
-closeTechnicianModal: function() {
-    document.getElementById('technicianModal').style.display = 'none';
-    document.getElementById('technicianName').value = '';
-},
-
-handleSaveWithName: async function(event) {
-    event.preventDefault();
-    const technicianName = document.getElementById('technicianName').value.trim();
-    
-    if (!technicianName) {
-        alert('Please enter technician name');
-        return;
-    }
-    
-    const buttonStatesArray = Object.values(this.buttonStates);
-    const timeslot = sessionStorage.getItem('timeslot');
-    
-    try {
-        const response = await fetch(`${CONFIG.API_URL}/api/save`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-                buttonStates: buttonStatesArray,
-                timeslot: timeslot,
-                technicianName: technicianName
-            })
-        });
+    saveOperations: async function() {
+        const buttonStatesArray = Object.values(this.buttonStates);
+        const timeslot = sessionStorage.getItem('timeslot');
         
-        const data = await response.json();
-        
-        if (data.success) {
-            this.closeTechnicianModal();
-            alert('Operations saved successfully!');
-        } else {
-            alert('Error saving operations: ' + (data.error || 'Unknown error'));
+        try {
+            const response = await fetch(`${CONFIG.API_URL}/api/save`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    buttonStates: buttonStatesArray,
+                    timeslot: timeslot
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('Operations saved successfully!');
+            } else {
+                alert('Error saving operations: ' + (data.error || 'Unknown error'));
+            }
+        } catch (error) {
+            alert('Connection error. Please try again.');
+            console.error('Save error:', error);
         }
-    } catch (error) {
-        alert('Connection error. Please try again.');
-        console.error('Save error:', error);
-    }
-},
+    },
     
     downloadReport: async function() {
         try {

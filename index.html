@@ -8,6 +8,19 @@
 </head>
 <body>
     <div id="app"></div>
+    <!-- Save Confirmation Modal -->
+<div id="saveModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2>Save Operations?</h2>
+        <p>Are you sure you want to save the current operations?</p>
+
+        <div class="modal-actions">
+            <button id="confirmSaveBtn" class="modal-btn confirm-btn">Yes, Save</button>
+            <button id="cancelSaveBtn" class="modal-btn cancel-btn">Cancel</button>
+        </div>
+    </div>
+</div>
+
     
     <!-- Load JavaScript modules -->
     <script src="js/config.js"></script>

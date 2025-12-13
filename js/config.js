@@ -16,7 +16,7 @@ const CONFIG = {
     // Timeslot configurations (in minutes from midnight)
     TIMESLOTS: {
         '7am': { start: 390, end: 480, label: '7:00 AM' },    // 6:30 AM - 8:00 AM
-        '3pm': { start: 870, end: 960, label: '3:00 PM' },    // 2:30 PM - 4:00 PM
+        '3pm': { start: 0, end: 1440, label: '3:00 PM' }, // 2:30 PM - 4:00 PM
         '10pm': { start: 1290, end: 1380, label: '10:00 PM' } // 9:30 PM - 11:00 PM
     }
 

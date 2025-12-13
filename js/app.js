@@ -6,9 +6,19 @@ const App = {
 
     // Initialize the app
     init: function () {
-        Router.init();
-    },
+    Router.init();
 
+    // Attach modal button events
+    const confirmBtn = document.getElementById('confirmSaveBtn');
+    const cancelBtn = document.getElementById('cancelSaveBtn');
+
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', () => this.confirmSave());
+    }
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => this.closeSaveModal());
+    }
+},
     // Login Page Functions
     selectUserType: function (type) {
         sessionStorage.setItem('userType', type);

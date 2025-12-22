@@ -6,19 +6,20 @@ const App = {
 
     // Initialize the app
     init: function () {
-    Router.init();
+        Router.init();
 
-    // Attach modal button events
-    const confirmBtn = document.getElementById('confirmSaveBtn');
-    const cancelBtn = document.getElementById('cancelSaveBtn');
+        // Attach modal button events
+        const confirmBtn = document.getElementById('confirmSaveBtn');
+        const cancelBtn = document.getElementById('cancelSaveBtn');
 
-    if (confirmBtn) {
-        confirmBtn.addEventListener('click', () => this.confirmSave());
-    }
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', () => this.closeSaveModal());
-    }
-},
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', () => this.confirmSave());
+        }
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => this.closeSaveModal());
+        }
+    },
+
     // Login Page Functions
     selectUserType: function (type) {
         sessionStorage.setItem('userType', type);
@@ -35,7 +36,7 @@ const App = {
             const response = await fetch(`${CONFIG.API_URL}/api/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
+                credentials: 'include', // Necessary for Cross-Origin Cookies
                 body: JSON.stringify({ userType, password })
             });
 
@@ -45,7 +46,7 @@ const App = {
                 sessionStorage.setItem('authenticated', 'true');
                 Router.navigate('timeslot');
             } else {
-                errorMessage.textContent = 'Invalid password. Please try again.';
+                errorMessage.textContent = data.error || 'Invalid password. Please try again.';
             }
         } catch (error) {
             errorMessage.textContent = 'Connection error. Please try again.';
@@ -55,6 +56,8 @@ const App = {
     // Timeslot Page
     initTimeslotPage: function () {
         this.updateTimeslots();
+        // Clear old interval if exists
+        if (this.timeslotInterval) clearInterval(this.timeslotInterval);
         this.timeslotInterval = setInterval(() => this.updateTimeslots(), 60000);
     },
 
@@ -99,6 +102,9 @@ const App = {
     initOperationsPage: function () {
         this.buttonStates = {};
         const grid = document.getElementById('operationsGrid');
+        if (!grid) return;
+
+        grid.innerHTML = ''; // Clear existing
 
         CONFIG.BUTTON_NAMES.forEach((name, index) => {
             const button = document.createElement('button');
@@ -141,7 +147,6 @@ const App = {
         }
     },
 
-    // 🔥 SAVE CONFIRMATION MODAL (NEW)
     showSaveModal: function () {
         document.getElementById('saveModal').style.display = 'flex';
     },
@@ -155,7 +160,7 @@ const App = {
         this.saveOperations();
     },
 
-    // Actual Save API Call
+    // Refactored Save API Call with 401 handling
     saveOperations: async function () {
         const buttonStatesArray = Object.values(this.buttonStates);
         const timeslot = sessionStorage.getItem('timeslot');
@@ -168,21 +173,36 @@ const App = {
                 body: JSON.stringify({ buttonStates: buttonStatesArray, timeslot })
             });
 
+            if (response.status === 401) {
+                alert('Session expired. Please login again.');
+                sessionStorage.clear();
+                Router.navigate('login');
+                return;
+            }
+
             const data = await response.json();
 
             if (data.success) {
                 alert('Operations saved successfully!');
             } else {
-                alert('Error saving operations.');
+                alert('Error saving operations: ' + (data.error || 'Unknown error'));
             }
         } catch (error) {
-            alert('Connection error.');
+            alert('Connection error. Please check if the server is running.');
         }
     },
 
     downloadReport: async function () {
         try {
-            const response = await fetch(`${CONFIG.API_URL}/api/download`, { credentials: 'include' });
+            const response = await fetch(`${CONFIG.API_URL}/api/download`, { 
+                credentials: 'include' 
+            });
+
+            if (response.status === 401) {
+                alert('Session expired. Please login again.');
+                Router.navigate('login');
+                return;
+            }
 
             if (response.ok) {
                 const blob = await response.blob();
@@ -211,9 +231,15 @@ const App = {
                 credentials: 'include'
             });
 
+            if (response.status === 401) {
+                alert('Session expired. Please login again.');
+                Router.navigate('login');
+                return;
+            }
+
             const data = await response.json();
             if (data.success) alert('Logs deleted successfully!');
-            else alert('Error deleting logs.');
+            else alert('Error deleting logs: ' + (data.error || 'Access Denied'));
         } catch (error) {
             alert('Error deleting logs.');
         }

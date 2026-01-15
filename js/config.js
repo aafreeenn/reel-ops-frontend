@@ -1,7 +1,7 @@
 // Configuration
 const CONFIG = {
-    //API_URL: 'http://localhost:5001',  // For local development
-    API_URL: 'https://reel-ops-backend.onrender.com',  // For production
+    API_URL: "http://localhost:5000",  // For local development
+    //API_URL: 'https://reel-ops-backend.onrender.com',  // For production
     
     // Button names 
     BUTTON_NAMES: [

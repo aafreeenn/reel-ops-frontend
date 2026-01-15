@@ -164,13 +164,20 @@ const App = {
     saveOperations: async function () {
         const buttonStatesArray = Object.values(this.buttonStates);
         const timeslot = sessionStorage.getItem('timeslot');
+        const technicianName = sessionStorage.getItem('technicianName') || '';
+
 
         try {
             const response = await fetch(`${CONFIG.API_URL}/api/save`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify({ buttonStates: buttonStatesArray, timeslot })
+                body: JSON.stringify({
+    buttonStates: buttonStatesArray,
+    timeslot,
+    technicianName
+})
+
             });
 
             if (response.status === 401) {
@@ -243,7 +250,29 @@ const App = {
         } catch (error) {
             alert('Error deleting logs.');
         }
+    },
+
+    handleSaveWithName: function (event) {
+    event.preventDefault();
+
+    const nameInput = document.getElementById('technicianName');
+    const technicianName = nameInput ? nameInput.value.trim() : '';
+
+    if (!technicianName) {
+        alert('Please enter technician name');
+        return;
     }
+
+    sessionStorage.setItem('technicianName', technicianName);
+    document.getElementById('technicianModal').style.display = 'none';
+
+    this.saveOperations();
+},
+
+closeTechnicianModal: function () {
+    document.getElementById('technicianModal').style.display = 'none';
+},
+
 };
 
 // Initialize app
